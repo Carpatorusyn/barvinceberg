@@ -6,6 +6,7 @@ body, html {
     height: 100%;
     overflow: hidden; /* Вимикаємо стандартний скролінг сторінки */
     background-color: #0b132b; /* Темно-синій колір фону */
+    touch-action: none; /* Забороняємо стандартні жести браузера (свайпи, збільшення екрана) */
     color: white;
     font-family: sans-serif;
 }

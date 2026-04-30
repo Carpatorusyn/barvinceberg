@@ -110,6 +110,97 @@ window.addEventListener('resize', () => {
     iceberg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
 });
 
+// --- ДОДАЄМО ПІДТРИМКУ СЕНСОРНИХ ЕКРАНІВ (TOUCH EVENTS) ---
+
+let initialPinchDistance = null; // Початкова відстань між пальцями
+let initialPinchScale = 1;       // Масштаб на початку зуму
+let lastCenterX = 0;             // Центр між пальцями (по X)
+let lastCenterY = 0;             // Центр між пальцями (по Y)
+
+// Функція для вирахування відстані між двома пальцями
+function getPinchDistance(touch1, touch2) {
+    const dx = touch1.clientX - touch2.clientX;
+    const dy = touch1.clientY - touch2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+// Функція для знаходження центру між двома пальцями
+function getPinchCenter(touch1, touch2) {
+    return {
+        x: (touch1.clientX + touch2.clientX) / 2,
+        y: (touch1.clientY + touch2.clientY) / 2
+    };
+}
+
+window.addEventListener('touchstart', (event) => {
+    if (event.touches.length === 1) {
+        // Один палець: готуємося до перетягування
+        isDragging = true;
+        startMouseX = event.touches[0].clientX;
+        startMouseY = event.touches[0].clientY;
+        startPosX = posX;
+        startPosY = posY;
+        iceberg.classList.add('dragging');
+    } else if (event.touches.length === 2) {
+        // Два пальці: готуємося до зуму (pinch)
+        isDragging = false; // Вимикаємо звичайне перетягування
+        initialPinchDistance = getPinchDistance(event.touches[0], event.touches[1]);
+        initialPinchScale = scale;
+        
+        const center = getPinchCenter(event.touches[0], event.touches[1]);
+        lastCenterX = center.x;
+        lastCenterY = center.y;
+    }
+}, { passive: false });
+
+window.addEventListener('touchmove', (event) => {
+    event.preventDefault(); // Забороняємо браузеру робити свої дії (наприклад, скролити)
+
+    if (event.touches.length === 1 && isDragging) {
+        // Перетягування одним пальцем
+        const dx = event.touches[0].clientX - startMouseX;
+        const dy = event.touches[0].clientY - startMouseY;
+        posX = startPosX + dx;
+        posY = startPosY + dy;
+
+        checkBounds();
+        iceberg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+    } else if (event.touches.length === 2 && initialPinchDistance) {
+        // Зум двома пальцями
+        const currentPinchDistance = getPinchDistance(event.touches[0], event.touches[1]);
+        const pinchRatio = currentPinchDistance / initialPinchDistance;
+        
+        let newScale = initialPinchScale * pinchRatio;
+        newScale = Math.min(Math.max(minScale, newScale), maxScale);
+
+        if (newScale !== scale) {
+            scale = newScale;
+            
+            // Логіка зникнення води при наближенні
+            const diveThreshold = 2.3;
+            if (scale >= diveThreshold) {
+                iceberg.classList.add('hide-water');
+            } else {
+                iceberg.classList.remove('hide-water');
+            }
+
+            // Оновлюємо позицію, щоб зум йшов у центр між пальцями, а не в кут
+            checkBounds();
+            iceberg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+        }
+    }
+}, { passive: false });
+
+window.addEventListener('touchend', (event) => {
+    if (event.touches.length < 2) {
+        initialPinchDistance = null; // Скидаємо зум, якщо пальців менше двох
+    }
+    if (event.touches.length === 0) {
+        isDragging = false; // Повністю зупиняємо перетягування
+        iceberg.classList.remove('dragging');
+    }
+});
+
 // --- ЛОГІКА МОДАЛЬНОГО ВІКНА ---
 
 // Знаходимо потрібні елементи на сторінці
