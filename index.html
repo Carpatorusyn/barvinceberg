@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сайт-Айсберг</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Контейнер, щоб сховати все, що виходить за межі екрана -->
+    <div class="viewport">
+        <!-- Сам айсберг, який будемо зумити -->
+        <div class="iceberg" id="iceberg">
+            <!-- Додаємо зображення вашого айсберга -->
+            <img src="iceberg.png" alt="Айсберг" class="iceberg-image">
+
+            <!-- Контейнер з прямокутниками (рівнями) -->
+            <div class="levels-container">
+                <div class="level level-1">
+                    <div class="level-item">Тестовий прикол</div>
+                    <div class="level-item">Тестовий прикол 2</div>
+                    <div class="level-item">Тестовий прикол 3</div>
+                </div>
+                <div class="level level-2"></div>
+                <div class="level level-3"></div>
+                <div class="level level-4"></div>
+                <div class="level level-5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальне вікно (сховане за замовчуванням) -->
+    <div class="modal-overlay hidden" id="test-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close-btn">&times;</button>
+            <p>це тестовий прикол. Очікуйте наступних оновлень. Ваш барвінок</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
